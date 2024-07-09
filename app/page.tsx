@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -154,7 +155,11 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Prompt</FormLabel>
                 <FormControl>
-                  <Input placeholder='Enter your prompt here' {...field} />
+                  <Textarea
+                    rows={8}
+                    placeholder='Enter your prompt here'
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>
                   Enter the prompt for prediction.
