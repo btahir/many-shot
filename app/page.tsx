@@ -25,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Progress } from '@/components/ui/progress'
 
 type ModelInfo = {
   value: string
@@ -61,6 +62,7 @@ const models: ModelInfo[] = [
   },
   { value: 'gpt-4o', label: 'GPT-4o', platform: 'openai' },
   { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', platform: 'openai' },
+  { value: 'gpt-3.5-turbo', label: 'GPT-3-5 Turbo', platform: 'openai' },
 ]
 
 const formSchema = z.object({
@@ -74,6 +76,7 @@ type FormValues = z.infer<typeof formSchema>
 export default function Home() {
   const [results, setResults] = React.useState<Result[]>([])
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [progress, setProgress] = React.useState<number>(0)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -116,6 +119,7 @@ export default function Home() {
           model: data.selectedModel,
           prediction: result,
         })
+        setProgress(((i + 1) / data.runs) * 100)
       } catch (error) {
         console.error(`Error with model ${data.selectedModel}:`, error)
       }
@@ -217,18 +221,14 @@ export default function Home() {
           </Button>
         </form>
       </Form>
+      {isLoading && (
+        <div className='mt-4'>
+          <Progress value={progress} className='w-[60%]' />
+        </div>
+      )}
       {results.length > 0 && (
         <div className='mt-4'>
           <h2 className='text-xl font-semibold'>Results:</h2>
-          <ul>
-            {results.map((result, index) => (
-              <li key={index}>
-                Run {result.iteration}: {result.model}:{' '}
-                {result.prediction.prediction}
-              </li>
-            ))}
-          </ul>
-          <h3 className='text-lg font-semibold mt-4'>Frequency:</h3>
           <pre>{JSON.stringify(calculateFrequency(results), null, 2)}</pre>
         </div>
       )}
