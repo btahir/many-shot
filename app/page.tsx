@@ -106,6 +106,7 @@ export default function Home() {
   const [chartData, setChartData] = useState<
     { option: string; frequency: number }[]
   >([])
+  const [error, setError] = useState<string | null>(null)
 
   const resultsRef = useRef<HTMLDivElement>(null)
 
@@ -132,18 +133,36 @@ export default function Home() {
     const model = models.find((m) => m.value === modelValue)
     if (!model) throw new Error('Invalid model selected')
 
-    const response = await fetch(`/api/${model.platform}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        question,
-        answerOptions: answerOptions.map((option) => option.value),
-        model: modelValue,
-      }),
-    })
-    return await response.json()
+    try {
+      const response = await fetch(`/api/${model.platform}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          answerOptions: answerOptions.map((option) => option.value),
+          model: modelValue,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'An error occurred')
+      }
+
+      return await response.json()
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.message.includes('API key')) {
+          throw new Error(
+            'API key is missing or invalid. Please check your configuration.'
+          )
+        }
+        throw error
+      }
+      throw new Error('An unexpected error occurred')
+    }
   }
 
   const calculateFrequency = (
@@ -185,35 +204,43 @@ export default function Home() {
 
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true)
+    setError(null)
     const newResults: Result[] = []
     const runId = nanoid()
 
-    for (let i = 0; i < data.runs; i++) {
-      try {
-        const result = await makePrediction(
-          data.selectedModel,
-          data.question,
-          data.answerOptions
-        )
-        newResults.push({
-          runId,
-          iteration: i + 1,
-          model: data.selectedModel,
-          prediction: result,
-        })
-        setProgress(((i + 1) / data.runs) * 100)
-      } catch (error) {
-        console.error(`Error with model ${data.selectedModel}:`, error)
+    try {
+      for (let i = 0; i < data.runs; i++) {
+        try {
+          const result = await makePrediction(
+            data.selectedModel,
+            data.question,
+            data.answerOptions
+          )
+          newResults.push({
+            runId,
+            iteration: i + 1,
+            model: data.selectedModel,
+            prediction: result,
+          })
+          setProgress(((i + 1) / data.runs) * 100)
+        } catch (error) {
+          if (error instanceof Error) {
+            setError(error.message)
+          } else {
+            setError('An unexpected error occurred')
+          }
+          break
+        }
+
+        setResults([...newResults])
+        const frequency = calculateFrequency(newResults)
+        updateChartData(frequency)
+        await new Promise((resolve) => setTimeout(resolve, 500)) // Delay between runs
       }
-
-      setResults([...newResults])
-      const frequency = calculateFrequency(newResults)
-      updateChartData(frequency)
-      await new Promise((resolve) => setTimeout(resolve, 500)) // Delay between runs
+    } finally {
+      setIsLoading(false)
+      setProgress(0)
     }
-
-    setIsLoading(false)
-    setProgress(0)
   }
 
   const totalRuns = useMemo(() => {
@@ -379,6 +406,11 @@ export default function Home() {
       {isLoading && (
         <div className='mt-12'>
           <Progress value={progress} className='w-[60%]' />
+        </div>
+      )}
+      {error && (
+        <div className='mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded'>
+          Error: {error}
         </div>
       )}
       {results.length > 0 && (
