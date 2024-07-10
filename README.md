@@ -1,37 +1,71 @@
-# Many-Shot Predictions
+# Many-Shot Predictions App
 
-[Watch the demo video](https://www.loom.com/share/714872afe1414c94b1ff1a51e34441ca?sid=5a55bf26-bb21-4671-b9ee-b201ff193efd)
+[![Watch the demo video](https://img.shields.io/badge/Watch-Demo%20Video-blue?style=for-the-badge&logo=loom)](https://www.loom.com/share/714872afe1414c94b1ff1a51e34441ca?sid=5a55bf26-bb21-4671-b9ee-b201ff193efd)
+
+![Demo GIF](/public/demo.gif)
 
 ## Overview
 
-The Many-Shot Prediction App allows users to run multiple predictions on the same prompt using various models, providing a platform to compare and analyze the performance of different AI models. It supports models from OpenAI, Anthropic, Gemini, as well as a local model and lets users input a question along with multiple answer options to receive a prediction based on the selected model.
+The Many-Shot Prediction App is a powerful tool for comparing and analyzing the performance of various AI models. It allows users to run multiple predictions on the same prompt using different models, including those from OpenAI, Anthropic, Gemini, and a local model.
 
-Recent findings have shown that we can achieve greater predictability in language model outputs by running the same prompt multiple times. This app provides an easy way to run the same prompt N times and visualize the results, helping you understand the distribution and consistency of model responses.
+Recent research has shown that running the same prompt multiple times can lead to greater predictability in language model outputs. This app provides an intuitive interface to run a prompt N times and visualize the results, helping you understand the distribution and consistency of model responses.
 
-Please add your own API keys for each platform before running the app. If you just want to test it out try the demo with the local model although it will be slower.
+## Features
+
+- Support for multiple AI platforms: OpenAI, Anthropic, Gemini, and a local model
+- Customizable number of prediction runs
+- Input for questions and multiple answer options
+- Visualization of prediction results
+- Easy comparison of model performances
 
 ## Getting Started
 
-Clone the repo and install all dependencies. You can run the development server:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/many-shot-predictions.git
+   cd many-shot-predictions
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Set up environment variables (see below)
 
-## Setup Environment Variables
+4. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   # or
+   bun dev
+   ```
 
-The app will only work for the platform who's API key you have provided. Create a .env.local file in the root directory of the project and add your API keys:
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory and add your API keys:
 
 ```bash
 OPENAI_API_KEY=your_openai_api_key
 ANTHROPIC_API_KEY=your_anthropic_api_key
-GEMINI_API_KEY=your_gemini_key
+GEMINI_API_KEY=your_gemini_api_key
 ```
+
+**Note:** The app will only work for the platforms whose API keys you have provided. If you want to test it out quickly, you can use the local model option, although it may be slower.
+
+## Contributing
+
+We welcome contributions! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
