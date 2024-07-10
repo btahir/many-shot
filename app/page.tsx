@@ -280,14 +280,30 @@ export default function Home() {
 
   return (
     <div className='container mx-auto p-4'>
-      <h1 className='text-2xl font-bold mb-4 flex items-center'>
+      <h1 className='text-2xl sm:text-3xl font-bold my-4 flex items-center'>
         <img
           src='/apple-icon.png'
           alt='Apple icon'
-          className='h-10 w-10 mr-1'
+          className='h-8 w-8 mr-1 -ml-2'
         />
-        Many-Shot Prediction App
+        Many-Shot Predictions
       </h1>
+      <div className='mb-6 text-gray-700 text-sm sm:text-base space-y-2 text-muted-foreground'>
+        <p>
+          Recent findings have shown that we can achieve greater predictability
+          in language model outputs by running the same prompt multiple times.
+        </p>
+
+        <p>
+          This app provides an easy way to run the same prompt N times and
+          visualize the results, helping you understand the distribution and
+          consistency of model responses.
+        </p>
+
+        <p>
+          Please add your own API keys for each platform (OpenAI, Anthropic).
+        </p>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField

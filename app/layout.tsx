@@ -5,8 +5,9 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Many-Shot Prediction App',
-  description: 'Run multiple predictions using different models.',
+  title: 'Many-Shot Predictions',
+  description:
+    'Easily run multiple predictions on the same prompt.',
 }
 
 export default function RootLayout({
