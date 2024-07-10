@@ -21,12 +21,14 @@ Recent research has shown that running the same prompt multiple times can lead t
 ## Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/btahir/many-shot.git
    cd many-shot-predictions
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    # or
@@ -38,6 +40,7 @@ Recent research has shown that running the same prompt multiple times can lead t
 3. Set up environment variables (see below)
 
 4. Run the development server:
+
    ```bash
    npm run dev
    # or
@@ -59,6 +62,10 @@ GEMINI_API_KEY=your_gemini_api_key
 ```
 
 **Note:** The app will only work for the platforms whose API keys you have provided. If you want to test it out quickly, you can use the local model option, although it may be slower.
+
+## Demo App
+
+You can try out the demo app at https://many-shot.vercel.app. Please note that the demo version only works with the local model option.
 
 ## Contributing
 
