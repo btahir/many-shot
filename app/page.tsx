@@ -2,8 +2,7 @@
 
 import React from 'react'
 import { nanoid } from 'nanoid'
-// @ts-ignore
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
@@ -67,7 +66,10 @@ const models: ModelInfo[] = [
 ]
 
 const formSchema = z.object({
-  prompt: z.string().min(1, 'Prompt is required'),
+  question: z.string().min(1, 'Question is required'),
+  answerOptions: z
+    .array(z.object({ value: z.string().min(1, 'Answer option is required') }))
+    .min(1, 'At least one answer option is required'),
   runs: z.number().min(1, 'At least one run is required'),
   selectedModel: z.string().min(1, 'At least one model must be selected'),
 })
@@ -82,26 +84,36 @@ export default function Home() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prompt: '',
+      question: '',
+      answerOptions: [{ value: '' }],
       runs: 1,
       selectedModel: '',
     },
   })
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'answerOptions',
+  })
+
   const makePrediction = async (
     modelValue: string,
-    prompt: string
+    question: string,
+    answerOptions: { value: string }[]
   ): Promise<Prediction> => {
     const model = models.find((m) => m.value === modelValue)
     if (!model) throw new Error('Invalid model selected')
-    // return { prediction: 'Prediction' }
 
     const response = await fetch(`/api/${model.platform}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ prompt, model: modelValue }),
+      body: JSON.stringify({
+        question,
+        answerOptions: answerOptions.map((option) => option.value),
+        model: modelValue,
+      }),
     })
     return await response.json()
   }
@@ -113,7 +125,11 @@ export default function Home() {
 
     for (let i = 0; i < data.runs; i++) {
       try {
-        const result = await makePrediction(data.selectedModel, data.prompt)
+        const result = await makePrediction(
+          data.selectedModel,
+          data.question,
+          data.answerOptions
+        )
         newResults.push({
           runId,
           iteration: i + 1,
@@ -128,8 +144,9 @@ export default function Home() {
       setResults([...newResults])
       await new Promise((resolve) => setTimeout(resolve, 500)) // Delay between runs
     }
-
+    
     setIsLoading(false)
+    setProgress(0)
   }
 
   const calculateFrequency = (
@@ -150,20 +167,55 @@ export default function Home() {
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField
             control={form.control}
-            name='prompt'
+            name='question'
             render={({ field }: any) => (
               <FormItem>
-                <FormLabel>Prompt</FormLabel>
+                <FormLabel>Question</FormLabel>
                 <FormControl>
                   <Textarea
-                    rows={8}
-                    placeholder='Enter your prompt here'
+                    rows={4}
+                    placeholder='Enter your question here'
                     {...field}
                   />
                 </FormControl>
                 <FormDescription>
-                  Enter the prompt for prediction.
+                  Enter the question for prediction.
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='answerOptions'
+            render={({ field }: any) => (
+              <FormItem>
+                <FormLabel>Answer Options</FormLabel>
+                <FormControl>
+                  <div>
+                    {fields.map((item, index) => (
+                      <div key={item.id} className='flex items-center mb-2'>
+                        <Input
+                          type='text'
+                          placeholder={`Answer option ${index + 1}`}
+                          {...form.register(
+                            `answerOptions.${index}.value` as const
+                          )}
+                        />
+                        <Button
+                          type='button'
+                          onClick={() => remove(index)}
+                          className='ml-2'
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    ))}
+                    <Button type='button' onClick={() => append({ value: '' })}>
+                      Add Option
+                    </Button>
+                  </div>
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
