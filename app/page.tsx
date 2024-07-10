@@ -348,7 +348,15 @@ export default function Home() {
       </h1>
       <div className='mb-6 text-sm sm:text-base space-y-2 text-muted-foreground'>
         <p>
-          Recent findings have shown that we can achieve greater predictability
+          Recent findings have shown that we can achieve{' '}
+          <a
+            className='font-medium text-blue-500 hover:text-blue-600'
+            target='_blank'
+            rel='noreferrer noopener'
+            href='https://x.com/clifflerner/status/1787137921050415186'
+          >
+            greater predictability
+          </a>{' '}
           in language model outputs by running the same prompt multiple times.
         </p>
 
