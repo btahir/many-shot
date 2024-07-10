@@ -288,7 +288,7 @@ export default function Home() {
         />
         Many-Shot Predictions
       </h1>
-      <div className='mb-6 text-gray-700 text-sm sm:text-base space-y-2 text-muted-foreground'>
+      <div className='mb-6 text-sm sm:text-base space-y-2 text-muted-foreground'>
         <p>
           Recent findings have shown that we can achieve greater predictability
           in language model outputs by running the same prompt multiple times.
