@@ -1,4 +1,7 @@
 # Many-Shot Predictions
+
+[Watch the demo video](./demo.mp4)
+
 ## Overview
 
 The Many-Shot Prediction App allows users to run multiple predictions on the same prompt using various models, providing a platform to compare and analyze the performance of different AI models. It supports models from OpenAI, Anthropic, Gemini, as well as a local model and lets users input a question along with multiple answer options to receive a prediction based on the selected model.
