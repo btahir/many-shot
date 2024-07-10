@@ -1,6 +1,6 @@
 # Many-Shot Predictions
 
-[Watch the demo video](./demo.mp4)
+[Watch the demo video](https://www.loom.com/share/714872afe1414c94b1ff1a51e34441ca?sid=5a55bf26-bb21-4671-b9ee-b201ff193efd)
 
 ## Overview
 
