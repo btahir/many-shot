@@ -377,7 +377,7 @@ export default function Home() {
         </form>
       </Form>
       {isLoading && (
-        <div className='mt-4'>
+        <div className='mt-12'>
           <Progress value={progress} className='w-[60%]' />
         </div>
       )}
