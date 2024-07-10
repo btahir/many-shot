@@ -148,13 +148,13 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.message || 'An error occurred')
+        throw new Error(errorData.error || 'An error occurred')
       }
 
       return await response.json()
     } catch (error) {
       if (error instanceof Error) {
-        if (error.message.includes('API key')) {
+        if (error.message.includes('API')) {
           throw new Error(
             'API key is missing or invalid. Please check your configuration.'
           )
