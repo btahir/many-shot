@@ -253,7 +253,14 @@ export default function Home() {
 
   return (
     <div className='container mx-auto p-4'>
-      <h1 className='text-2xl font-bold mb-4'>Many-Shot Prediction App</h1>
+      <h1 className='text-2xl font-bold mb-4 flex items-center'>
+        <img
+          src='/apple-icon.png'
+          alt='Apple icon'
+          className='h-10 w-10 mr-1'
+        />
+        Many-Shot Prediction App
+      </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
           <FormField
