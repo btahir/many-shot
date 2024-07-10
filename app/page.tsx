@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback } from 'react'
 import { nanoid } from 'nanoid'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -41,6 +41,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart'
+import { DownloadIcon } from 'lucide-react'
+import { toPng } from 'html-to-image'
 
 const chartConfig: any = {
   frequency: {
@@ -105,6 +107,8 @@ export default function Home() {
   const [chartData, setChartData] = useState<
     { option: string; frequency: number }[]
   >([])
+
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -216,6 +220,37 @@ export default function Home() {
   const totalRuns = useMemo(() => {
     return results.length
   }, [results])
+
+  const onDownload = useCallback(() => {
+    if (resultsRef.current === null) {
+      return
+    }
+
+    const originalWidth = resultsRef.current.offsetWidth
+    const originalHeight = resultsRef.current.offsetHeight
+    const canvasWidth = 600
+    const canvasHeight = (originalHeight / originalWidth) * canvasWidth
+
+    toPng(resultsRef.current, {
+      cacheBust: true,
+      backgroundColor: '#ffffff', // Set your desired background color
+      canvasWidth: canvasWidth, // Desired canvas width
+      canvasHeight: canvasHeight, // Proportional canvas height
+      style: {
+        width: `${originalWidth}px`,
+        height: `${originalHeight}px`,
+      },
+    })
+      .then((dataUrl) => {
+        const link = document.createElement('a')
+        link.download = 'prediction-results.png'
+        link.href = dataUrl
+        link.click()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [resultsRef])
 
   return (
     <div className='container mx-auto p-4'>
@@ -341,15 +376,30 @@ export default function Home() {
         </div>
       )}
       {results.length > 0 && (
-        <Card className='mt-8'>
+        <Card className='mt-8 relative' ref={resultsRef}>
           <CardHeader className='pb-0'>
-            <CardTitle className='text-2xl'>Prediction Results</CardTitle>
-            <CardDescription>Model: {results[0].model}</CardDescription>
+            <div className='flex justify-between items-center'>
+              <div>
+                <CardTitle className='text-2xl'>Prediction Results</CardTitle>
+                <CardDescription>Model: {results[0].model}</CardDescription>
+              </div>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={onDownload}
+                className='absolute top-4 right-4'
+              >
+                <DownloadIcon className='h-4 w-4' />
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className='flex flex-col-reverse sm:flex-row gap-8 sm:items-center'>
               <div className='flex-1 space-y-6'>
                 <div>
+                  <h3 className='text-lg font-semibold mb-3'>
+                    Numerical Results
+                  </h3>
                   <div className='space-y-2'>
                     {chartData.map((item) => (
                       <div
