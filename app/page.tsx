@@ -360,7 +360,8 @@ export default function Home() {
 
         <p>
           Please add your own API keys for each platform (OpenAI, Anthropic,
-          Gemini etc).
+          Gemini, etc). If you don't have or don't want to use those platforms,
+          you can try the local model (it is slower).
         </p>
       </div>
       <Form {...form}>
