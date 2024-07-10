@@ -53,7 +53,7 @@ const chartConfig: any = {
 type ModelInfo = {
   value: string
   label: string
-  platform: 'anthropic' | 'openai'
+  platform: 'anthropic' | 'openai' | 'gemini'
 }
 
 type Prediction = {
@@ -86,6 +86,16 @@ const models: ModelInfo[] = [
   { value: 'gpt-4o', label: 'GPT-4o', platform: 'openai' },
   { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', platform: 'openai' },
   { value: 'gpt-3.5-turbo', label: 'GPT-3-5 Turbo', platform: 'openai' },
+  {
+    value: 'gemini-1.5-flash-latest',
+    label: 'Gemini 1.5 Flash',
+    platform: 'gemini',
+  },
+  {
+    value: 'gemini-1.5-pro-latest',
+    label: 'Gemini 1.5 Pro',
+    platform: 'gemini',
+  },
 ]
 
 const formSchema = z.object({
@@ -301,7 +311,8 @@ export default function Home() {
         </p>
 
         <p>
-          Please add your own API keys for each platform (OpenAI, Anthropic).
+          Please add your own API keys for each platform (OpenAI, Anthropic,
+          Gemini etc).
         </p>
       </div>
       <Form {...form}>

@@ -8,6 +8,9 @@ dependencies:
   '@anthropic-ai/sdk':
     specifier: ^0.24.3
     version: 0.24.3
+  '@google/generative-ai':
+    specifier: ^0.14.1
+    version: 0.14.1
   '@hookform/resolvers':
     specifier: ^3.9.0
     version: 3.9.0(react-hook-form@7.52.1)
@@ -183,6 +186,11 @@ packages:
 
   /@floating-ui/utils@0.2.4:
     resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
+    dev: false
+
+  /@google/generative-ai@0.14.1:
+    resolution: {integrity: sha512-pevEyZCb0Oc+dYNlSberW8oZBm4ofeTD5wN01TowQMhTwdAbGAnJMtQzoklh6Blq2AKsx8Ox6FWa44KioZLZiA==}
+    engines: {node: '>=18.0.0'}
     dev: false
 
   /@hookform/resolvers@3.9.0(react-hook-form@7.52.1):
