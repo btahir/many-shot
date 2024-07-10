@@ -65,7 +65,7 @@ GEMINI_API_KEY=your_gemini_api_key
 
 ## Demo App
 
-You can try out the demo app **[here](https://many-shot.vercel.app)**. Please note that the demo version only works with the local model option.
+You can try out the demo app [here](https://many-shot.vercel.app). Please note that the demo version only works with the local model option.
 
 ## Contributing
 
