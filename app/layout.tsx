@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Many-Shot Prediction App',
-  description: 'Run multiple predictions using Anthropic and OpenAI models',
+  description: 'Run multiple predictions using different models.',
 }
 
 export default function RootLayout({

@@ -33,7 +33,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-// @ts-ignore
 import { Label, Pie, PieChart } from 'recharts'
 import {
   ChartConfig,
