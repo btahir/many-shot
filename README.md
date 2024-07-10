@@ -1,4 +1,4 @@
-# Many-Shot Predictions App
+# Many-Shot Predictions
 
 [![Watch the demo video](https://img.shields.io/badge/Watch-Demo%20Video-blue?style=for-the-badge&logo=loom)](https://www.loom.com/share/714872afe1414c94b1ff1a51e34441ca?sid=5a55bf26-bb21-4671-b9ee-b201ff193efd)
 
