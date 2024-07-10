@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import { useState, useMemo } from 'react'
 import { nanoid } from 'nanoid'
 import { useForm, Controller, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -26,6 +26,28 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Progress } from '@/components/ui/progress'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+// @ts-ignore
+import { Label, Pie, PieChart } from 'recharts'
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
+
+const chartConfig: any = {
+  frequency: {
+    label: 'Frequency',
+  },
+  // We'll dynamically add colors for each prediction option
+} satisfies ChartConfig
 
 type ModelInfo = {
   value: string
@@ -77,9 +99,12 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 export default function Home() {
-  const [results, setResults] = React.useState<Result[]>([])
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [progress, setProgress] = React.useState<number>(0)
+  const [results, setResults] = useState<Result[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [progress, setProgress] = useState<number>(0)
+  const [chartData, setChartData] = useState<
+    { option: string; frequency: number }[]
+  >([])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -118,6 +143,43 @@ export default function Home() {
     return await response.json()
   }
 
+  const calculateFrequency = (
+    predictions: Result[]
+  ): Record<string, number> => {
+    const frequency: Record<string, number> = {}
+    predictions.forEach((pred) => {
+      frequency[pred.prediction.prediction] =
+        (frequency[pred.prediction.prediction] || 0) + 1
+    })
+    return frequency
+  }
+
+  const updateChartData = (frequency: Record<string, number>) => {
+    const colors = [
+      'hsl(var(--chart-1))',
+      'hsl(var(--chart-2))',
+      'hsl(var(--chart-3))',
+      'hsl(var(--chart-4))',
+      'hsl(var(--chart-5))',
+    ]
+    const newChartData = Object.entries(frequency).map(
+      ([option, count], index) => ({
+        option,
+        frequency: count,
+        fill: colors[index % colors.length],
+      })
+    )
+    setChartData(newChartData)
+
+    // Update chartConfig with dynamic colors
+    newChartData.forEach(({ option, fill }) => {
+      chartConfig[option] = {
+        label: option,
+        color: fill,
+      }
+    })
+  }
+
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true)
     const newResults: Result[] = []
@@ -142,23 +204,18 @@ export default function Home() {
       }
 
       setResults([...newResults])
+      const frequency = calculateFrequency(newResults)
+      updateChartData(frequency)
       await new Promise((resolve) => setTimeout(resolve, 500)) // Delay between runs
     }
-    
+
     setIsLoading(false)
     setProgress(0)
   }
 
-  const calculateFrequency = (
-    predictions: Result[]
-  ): Record<string, number> => {
-    const frequency: Record<string, number> = {}
-    predictions.forEach((pred) => {
-      frequency[pred.prediction.prediction] =
-        (frequency[pred.prediction.prediction] || 0) + 1
-    })
-    return frequency
-  }
+  const totalRuns = useMemo(() => {
+    return results.length
+  }, [results])
 
   return (
     <div className='container mx-auto p-4'>
@@ -284,10 +341,91 @@ export default function Home() {
         </div>
       )}
       {results.length > 0 && (
-        <div className='mt-4'>
-          <h2 className='text-xl font-semibold'>Results:</h2>
-          <pre>{JSON.stringify(calculateFrequency(results), null, 2)}</pre>
-        </div>
+        <Card className='mt-8'>
+          <CardHeader className='pb-0'>
+            <CardTitle className='text-2xl'>Prediction Results</CardTitle>
+            <CardDescription>Model: {results[0].model}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className='flex flex-col-reverse sm:flex-row gap-8 sm:items-center'>
+              <div className='flex-1 space-y-6'>
+                <div>
+                  <div className='space-y-2'>
+                    {chartData.map((item) => (
+                      <div
+                        key={item.option}
+                        className='flex justify-between items-center py-1 border-b last:border-b-0'
+                      >
+                        <span className='font-medium'>{item.option}:</span>
+                        <span>
+                          {item.frequency} (
+                          {((item.frequency / totalRuns) * 100).toFixed(1)}%)
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className='pt-4 border-t'>
+                  <div className='flex justify-between items-center font-semibold text-lg'>
+                    <span>Total Runs:</span>
+                    <span>{totalRuns}</span>
+                  </div>
+                </div>
+              </div>
+              <div className='flex-1 flex justify-center items-center'>
+                <ChartContainer
+                  config={chartConfig}
+                  className='aspect-square w-full max-w-[300px]'
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={chartData}
+                      dataKey='frequency'
+                      nameKey='option'
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={0}
+                    >
+                      <Label
+                        content={({ viewBox }: any) => {
+                          if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
+                            return (
+                              <text
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                textAnchor='middle'
+                                dominantBaseline='middle'
+                              >
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className='fill-foreground text-2xl font-bold'
+                                >
+                                  {totalRuns.toLocaleString()}
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 20}
+                                  className='fill-muted-foreground text-xs'
+                                >
+                                  Total Runs
+                                </tspan>
+                              </text>
+                            )
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
