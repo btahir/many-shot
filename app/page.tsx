@@ -42,6 +42,8 @@ import {
 } from '@/components/ui/chart'
 import { DownloadIcon } from 'lucide-react'
 import { toPng } from 'html-to-image'
+import PipelineSingleton from '@/lib/pipeline.js'
+import { generatePrompt } from '@/lib/utils'
 
 const chartConfig: any = {
   frequency: {
@@ -53,7 +55,7 @@ const chartConfig: any = {
 type ModelInfo = {
   value: string
   label: string
-  platform: 'anthropic' | 'openai' | 'gemini'
+  platform: 'anthropic' | 'openai' | 'gemini' | 'local'
 }
 
 type Prediction = {
@@ -96,6 +98,11 @@ const models: ModelInfo[] = [
     label: 'Gemini 1.5 Pro',
     platform: 'gemini',
   },
+  {
+    value: 'Qwen1.5-0.5B',
+    label: 'Qwen 1.5-0.5B (Local Model)',
+    platform: 'local',
+  },
 ]
 
 const formSchema = z.object({
@@ -135,6 +142,21 @@ export default function Home() {
     name: 'answerOptions',
   })
 
+  const extractPrediction = (text: string) => {
+    const regex = /"prediction":\s*"(.*?)"/g
+    let match
+    let lastMatch
+
+    while ((match = regex.exec(text)) !== null) {
+      lastMatch = match
+    }
+
+    if (lastMatch) {
+      return { prediction: lastMatch[1] }
+    }
+    throw new Error('No valid prediction found')
+  }
+
   const makePrediction = async (
     modelValue: string,
     question: string,
@@ -142,36 +164,62 @@ export default function Home() {
   ): Promise<Prediction> => {
     const model = models.find((m) => m.value === modelValue)
     if (!model) throw new Error('Invalid model selected')
+    const prompt = generatePrompt(question, answerOptions)
 
-    try {
-      const response = await fetch(`/api/${model.platform}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          question,
-          answerOptions: answerOptions.map((option) => option.value),
-          model: modelValue,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'An error occurred')
-      }
-
-      return await response.json()
-    } catch (error) {
-      if (error instanceof Error) {
-        if (error.message.includes('API')) {
-          throw new Error(
-            'API key is missing or invalid. Please check your configuration.'
-          )
+    if (model.platform === 'local') {
+      // Handle local model prediction
+      try {
+        const localModel: any = await PipelineSingleton.getInstance()
+        const messages = [
+          { role: 'system', content: 'You are the worlds greatest predictor.' },
+          { role: 'user', content: prompt },
+        ]
+        const text = localModel.tokenizer.apply_chat_template(messages, {
+          tokenize: false,
+          add_generation_prompt: true,
+        })
+        const output = await localModel(text, {
+          max_new_tokens: 128,
+          do_sample: false,
+        })
+        const prediction = extractPrediction(output[0].generated_text.trim())
+        return prediction
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(error.message)
         }
-        throw error
+        throw new Error('An unexpected error occurred')
       }
-      throw new Error('An unexpected error occurred')
+    } else {
+      try {
+        const response = await fetch(`/api/${model.platform}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            prompt,
+            model: modelValue,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'An error occurred')
+        }
+
+        return await response.json()
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.message.includes('API')) {
+            throw new Error(
+              'API key is missing or invalid. Please check your configuration.'
+            )
+          }
+          throw error
+        }
+        throw new Error('An unexpected error occurred')
+      }
     }
   }
 
