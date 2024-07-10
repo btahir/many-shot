@@ -126,6 +126,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   const resultsRef = useRef<HTMLDivElement>(null)
+  const stopRequestedRef = useRef<boolean>(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -260,14 +261,22 @@ export default function Home() {
     })
   }
 
+  const onStop = useCallback(() => {
+    stopRequestedRef.current = true
+  }, [])
+
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true)
     setError(null)
+    stopRequestedRef.current = false
     const newResults: Result[] = []
     const runId = nanoid()
 
     try {
       for (let i = 0; i < data.runs; i++) {
+        if (stopRequestedRef.current) {
+          break
+        }
         try {
           const result = await makePrediction(
             data.selectedModel,
@@ -298,6 +307,7 @@ export default function Home() {
     } finally {
       setIsLoading(false)
       setProgress(0)
+      stopRequestedRef.current = false
     }
   }
 
@@ -485,6 +495,16 @@ export default function Home() {
           <Button type='submit' disabled={isLoading}>
             {isLoading ? 'Running...' : 'Run Predictions'}
           </Button>
+          {isLoading && (
+            <Button
+              className='ml-4'
+              type='button'
+              onClick={onStop}
+              variant='destructive'
+            >
+              Stop
+            </Button>
+          )}
         </form>
       </Form>
       {isLoading && (
