@@ -1,8 +1,11 @@
-# Many-Shot Prediction App
-
+# Many-Shot Predictions
 ## Overview
 
-The Many-Shot Prediction App allows users to run multiple predictions using various models, providing a platform to compare and analyze the performance of different AI models. It supports models from OpenAI and Anthropic, and lets users input a question along with multiple answer options to receive a prediction based on the selected model.
+The Many-Shot Prediction App allows users to run multiple predictions on the same prompt using various models, providing a platform to compare and analyze the performance of different AI models. It supports models from OpenAI and Anthropic, and lets users input a question along with multiple answer options to receive a prediction based on the selected model.
+
+Recent findings have shown that we can achieve greater predictability in language model outputs by running the same prompt multiple times. This app provides an easy way to run the same prompt N times and visualize the results, helping you understand the distribution and consistency of model responses.
+
+Please add your own API keys for each platform (OpenAI, Anthropic) before running the app.
 
 ## Getting Started
 
