@@ -22,7 +22,7 @@ Recent research has shown that running the same prompt multiple times can lead t
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/many-shot-predictions.git
+   git clone https://github.com/btahir/many-shot.git
    cd many-shot-predictions
    ```
 
@@ -44,8 +44,6 @@ Recent research has shown that running the same prompt multiple times can lead t
    yarn dev
    # or
    pnpm dev
-   # or
-   bun dev
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to use the app.
