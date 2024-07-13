@@ -377,9 +377,18 @@ export default function Home() {
         </p>
 
         <p>
-          Please add your own API keys for each platform (OpenAI, Anthropic,
-          Gemini, etc). If you don&apos;t want to use those platforms, you can
-          try a local browser model but it is slower.
+          You will need to clone{' '}
+          <a
+            className='font-medium text-blue-500 hover:text-blue-600'
+            target='_blank'
+            rel='noreferrer noopener'
+            href='https://github.com/btahir/many-shot'
+          >
+            the GitHub repository
+          </a>{' '}
+          and add your own API keys for each platform (OpenAI, Anthropic,
+          Gemini, etc.). If you prefer not to use those platforms, you can try a
+          local browser model, but it is slower.
         </p>
       </div>
       <Form {...form}>
