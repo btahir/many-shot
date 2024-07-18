@@ -86,6 +86,7 @@ const models: ModelInfo[] = [
     platform: 'anthropic',
   },
   { value: 'gpt-4o', label: 'GPT-4o', platform: 'openai' },
+  { value: 'gpt-4o-mini', label: 'GPT-4o mini', platform: 'openai' },
   { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', platform: 'openai' },
   { value: 'gpt-3.5-turbo', label: 'GPT-3-5 Turbo', platform: 'openai' },
   {
